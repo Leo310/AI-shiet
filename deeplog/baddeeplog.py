@@ -17,11 +17,11 @@ preprocessor = Preprocessor(
 
 # Load data from HDFS dataset
 X_train, y_train, label_train, mapping_train = preprocessor.text(
-    "./data/hdfs_train", verbose=True)
+    "../data/parsed/hdfs_train2", verbose=True)
 X_test, y_test, label_test, mapping_test = preprocessor.text(
-    "./data/hdfs_test_normal", verbose=True)
+    "../data/parsed/hdfs_test_normal", verbose=True)
 X_test_anomaly, y_test_anomaly, label_test_anomaly, mapping_test_anomaly = preprocessor.text(
-    "./data/hdfs_test_abnormal", verbose=True)
+    "../data/parsedhdfs_test_abnormal", verbose=True)
 
 ##############################################################################
 #                                  DeepLog                                   #
@@ -29,9 +29,9 @@ X_test_anomaly, y_test_anomaly, label_test_anomaly, mapping_test_anomaly = prepr
 
 # Create DeepLog object
 deeplog = DeepLog(
-    input_size=38,  # Number of different events to expect
+    input_size=29,  # Number of different events to expect
     hidden_size=64,  # Hidden dimension, we suggest 64
-    output_size=38,  # Number of different events to expect
+    output_size=29,  # Number of different events to expect
 )
 
 # Optionally cast data and DeepLog to cuda, if available
@@ -52,19 +52,17 @@ if torch.cuda.is_available():
 deeplog.fit(
     X=X_train,
     y=y_train,
-    epochs=10,
+    epochs=100,
     batch_size=128,
 )
-
-
 torch.cuda.empty_cache()
+
 # Predict normal data using deeplog
 y_pred_normal, confidence = deeplog.predict(
     X=X_test,
     # Change this value to get the top k predictions (called 'g' in DeepLog paper, see Figure 6)
     k=3,
 )
-print("Predicted normal datases")
 torch.cuda.empty_cache()
 # Predict anomalous data using deeplog
 y_pred_anomaly, confidence = deeplog.predict(
@@ -72,9 +70,8 @@ y_pred_anomaly, confidence = deeplog.predict(
     # Change this value to get the top k predictions (called 'g' in DeepLog paper, see Figure 6)
     k=3,
 )
-
 torch.cuda.empty_cache()
-print("Predicted abnormal datases")
+
 ################################################################################
 #                             Check for anomalies                              #
 ################################################################################
@@ -96,7 +93,11 @@ anomalies_abnormal = ~torch.any(
 )
 
 # Print the fraction of anomalies in normal data (False positives)
-print(f"False positives: {anomalies_normal.sum() / anomalies_normal.shape[0]}")
-
+print(f"false positives: {anomalies_normal.sum() / anomalies_normal.shape[0]}")
+print(y_pred_normal[10202])
+print(y_test.shape[0])
+print(y_pred_normal[10202])
+print(y_pred_normal[10])
+print(y_pred_normal[122])
 # Print the fraction of anomalies in abnormal data (True positives)
 print(f"True  positives: {anomalies_abnormal.sum() / anomalies_abnormal.shape[0]}")

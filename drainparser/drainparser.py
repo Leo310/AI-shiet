@@ -1,17 +1,14 @@
-# SPDX-License-Identifier: MIT
-
-import json
 import logging
 import time
 
 from drain3 import TemplateMiner
 from drain3.template_miner_config import TemplateMinerConfig
 
-DATA_PATH = "./data/HDFS.log"
+DATA_PATH = "../data/rawlogs/HDFS.log"
 LINE_COUNT = 100000
 TRAIN_LINE_COUNT = 100000
-OUTPUT_LOG = "./data/drainlog.log"
-OUTPUT_PARSED = "./data/my_hdfs_train"
+OUTPUT_LOG = "../data/other/drainlog.log"
+OUTPUT_PARSED = "../data/parsed/my_hdfs_train"
 DRAINSETTINGS = "./drain3settings.ini"
 
 # Remove all handlers associated with the root logger object.
@@ -35,24 +32,24 @@ start_time = time.time()
 # "pretrain" drain and some logging
 batch_start_time = start_time
 batch_size = 1
-with open(DATA_PATH) as f:
-    for _ in range(TRAIN_LINE_COUNT):
-        line = f.readline()
-        line = line.rstrip()
-        line = line.partition(": ")[2]
-        result = template_miner.add_log_message(line)
+# with open(DATA_PATH) as f:
+#     for _ in range(TRAIN_LINE_COUNT):
+#         line = f.readline()
+#         line = line.rstrip()
+#         line = line.partition(": ")[2]
+#         result = template_miner.add_log_message(line)
 
-        line_count += 1
-        if line_count % batch_size == 0:
-            time_took = time.time() - batch_start_time
-            rate = batch_size / time_took
-            # logger.info(f"Processing line: {line_count}, rate {rate:.1f} lines/sec, "
-            # f"{len(template_miner.drain.clusters)} clusters so far.")
-            batch_start_time = time.time()
-        # if result["change_type"] != "none":
-            result_json = json.dumps(result)
-            logger.info(f"Input ({line_count}): " + line)
-            logger.info("Result: " + result_json)
+#         line_count += 1
+#         if line_count % batch_size == 0:
+#             time_took = time.time() - batch_start_time
+#             rate = batch_size / time_took
+#             # logger.info(f"Processing line: {line_count}, rate {rate:.1f} lines/sec, "
+#             # f"{len(template_miner.drain.clusters)} clusters so far.")
+#             batch_start_time = time.time()
+#         # if result["change_type"] != "none":
+#             result_json = json.dumps(result)
+#             logger.info(f"Input ({line_count}): " + line)
+#             logger.info("Result: " + result_json)
 
 # fill in logSeqPerBlock dictionary
 with open(DATA_PATH) as f:
